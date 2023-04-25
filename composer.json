@@ -1,6 +1,6 @@
 {
-    "name": "laminas/laminas-console",
-    "description": "Build console applications using getopt syntax or routing, complete with prompts",
+    "name": "ocramius/laminas-console-temporary-fork",
+    "description": "UNMAINTAINED! A replacement for `laminas/laminas-console` that allows installation on PHP 8.0 onwards. Built for specific customer needs: do not use it in your own software, if not instructed to do so by Ocramius!",
     "license": "BSD-3-Clause",
     "keywords": [
         "laminas",
@@ -16,25 +16,29 @@
         "forum": "https://discourse.laminas.dev"
     },
     "config": {
-        "sort-packages": true
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.8.x-dev",
-            "dev-develop": "2.9.x-dev"
+        "sort-packages": true,
+        "platform": {
+            "php": "8.0.99"
         }
+    },
+    "conflict": {
+        "zendframework/zend-console": "*"
+    },
+    "provide": {
+        "laminas/laminas-console": "self.version"
+    },
+    "replace": {
+        "laminas/laminas-console": "*"
     },
     "require": {
         "php": "~8.0.0 || ~8.1.0",
-        "laminas/laminas-stdlib": "^3.2.1",
-        "laminas/laminas-zendframework-bridge": "^1.0"
+        "laminas/laminas-stdlib": "^3.16.1"
     },
     "require-dev": {
         "laminas/laminas-coding-standard": "~1.0.0",
-        "laminas/laminas-filter": "^2.7.2",
-        "laminas/laminas-json": "^2.6 || ^3.0",
-        "laminas/laminas-validator": "^2.10.1",
-        "phpunit/phpunit": "^9.5"
+        "laminas/laminas-filter": "^2.31.0",
+        "laminas/laminas-validator": "^2.30.1",
+        "phpunit/phpunit": "^9.6.7"
     },
     "suggest": {
         "laminas/laminas-filter": "To support DefaultRouteMatcher usage",
@@ -59,8 +63,5 @@
         "cs-fix": "phpcbf",
         "test": "phpunit --colors=always",
         "test-coverage": "phpunit --colors=always --coverage-clover clover.xml"
-    },
-    "replace": {
-        "zendframework/zend-console": "^2.8.0"
     }
 }
