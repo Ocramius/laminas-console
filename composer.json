@@ -34,6 +34,7 @@
         "laminas/laminas-filter": "^2.7.2",
         "laminas/laminas-json": "^2.6 || ^3.0",
         "laminas/laminas-validator": "^2.10.1",
+        "phpspec/prophecy": "^1.17",
         "phpunit/phpunit": "^9.5"
     },
     "suggest": {
