@@ -23,19 +23,19 @@ use PHPUnit\Framework\TestCase;
  */
 class DefaultRouteMatcherTest extends TestCase
 {
-    public static function routeProvider()
+    public static function routeProvider(): array
     {
         return [
             // -- mandatory long flags
-            'mandatory-long-flag-no-match' => [
+            'mandatory-long-flag-no-match'              => [
                 '--foo --bar',
-                ['a','b','--baz'],
-                null
+                ['a', 'b', '--baz'],
+                null,
             ],
-            'mandatory-long-flag-no-partial-match' => [
+            'mandatory-long-flag-no-partial-match'      => [
                 '--foo --bar',
-                ['--foo','--baz'],
-                null
+                ['--foo', '--baz'],
+                null,
             ],
             'mandatory-long-flag-match' => [
                 '--foo --bar',
@@ -962,20 +962,19 @@ class DefaultRouteMatcherTest extends TestCase
 
     /**
      * @dataProvider routeProvider
-     * @param        string         $routeDefinition
-     * @param        array          $arguments
-     * @param        array|null     $params
+     * @param string $routeDefinition
+     * @param array<int, string> $arguments
+     * @param array|null $params
      */
-    public function testMatching($routeDefinition, array $arguments = [], array $params = null)
+    public function testMatching($routeDefinition, array $arguments = [], array $params = null): void
     {
         $route = new DefaultRouteMatcher($routeDefinition);
         $match = $route->match($arguments);
 
-
         if ($params === null) {
             $this->assertNull($match, "The route must not match");
         } else {
-            $this->assertInternalType('array', $match);
+            $this->assertEquals('array', gettype($match));
 
             foreach ($params as $key => $value) {
                 if ($value === null) {
@@ -1093,7 +1092,7 @@ class DefaultRouteMatcherTest extends TestCase
         if ($params === null) {
             $this->assertNull($match, "The route must not match");
         } else {
-            $this->assertInternalType('array', $match);
+            $this->assertEquals('array', gettype($match));
 
             foreach ($params as $key => $value) {
                 $this->assertSame(
@@ -1192,7 +1191,7 @@ class DefaultRouteMatcherTest extends TestCase
         if ($shouldMatch === false) {
             $this->assertNull($match, "The route must not match");
         } else {
-            $this->assertInternalType('array', $match);
+            $this->assertEquals('array', gettype($match));
         }
     }
 
@@ -1273,7 +1272,7 @@ class DefaultRouteMatcherTest extends TestCase
         if ($params === null) {
             $this->assertNull($match, "The route must not match");
         } else {
-            $this->assertInternalType('array', $match);
+            $this->assertEquals('array', gettype($match));
 
             foreach ($params as $key => $value) {
                 $this->assertEquals(
@@ -1285,9 +1284,9 @@ class DefaultRouteMatcherTest extends TestCase
         }
     }
 
-    public function routeValidatorsProvider()
+    public function routeValidatorsProvider(): array
     {
-        if (! class_exists(Digits::class)) {
+        if (!class_exists(Digits::class)) {
             return [
                 'do-not-run' => [
                     '<string> <number>',
@@ -1344,7 +1343,7 @@ class DefaultRouteMatcherTest extends TestCase
         if ($shouldMatch === false) {
             $this->assertNull($match, "The route must not match");
         } else {
-            $this->assertInternalType('array', $match);
+            $this->assertEquals('array', gettype($match));
         }
     }
 
@@ -1397,7 +1396,7 @@ class DefaultRouteMatcherTest extends TestCase
      * @param string $routeDefinition
      * @param array $filters
      * @param array $arguments
-     * @param array $params
+     * @param array<int, ?string> $params
      */
     public function testParamsCanBeFiltered($routeDefinition, $filters, $arguments, $params)
     {
@@ -1408,7 +1407,7 @@ class DefaultRouteMatcherTest extends TestCase
             $this->fail("Route '$routeDefinition' must match.'");
         }
 
-        $this->assertInternalType('array', $match);
+        $this->assertEquals('array', gettype($match));
 
         foreach ($params as $key => $value) {
             $this->assertEquals(
@@ -1419,27 +1418,27 @@ class DefaultRouteMatcherTest extends TestCase
         }
     }
 
-    public function testConstructorDoesNotAcceptInvalidFilters()
+    public function testConstructorDoesNotAcceptInvalidFilters(): void
     {
         $this->expectException('Laminas\Console\Exception\InvalidArgumentException');
         new DefaultRouteMatcher('<foo>', [], [], [], [
-            new \stdClass()
+            new \stdClass(),
         ]);
     }
 
-    public function testConstructorDoesNotAcceptInvalidValidators()
+    public function testConstructorDoesNotAcceptInvalidValidators(): void
     {
         $this->expectException('Laminas\Console\Exception\InvalidArgumentException');
         new DefaultRouteMatcher('<foo>', [], [], [], [], [
-            new \stdClass()
+            new \stdClass(),
         ]);
     }
 
-    public function testIllegalRouteDefinitions()
+    public function testIllegalRouteDefinitions(): void
     {
         $badRoutes = [
             '[...catchall1] [...catchall2]' => 'Cannot define more than one catchAll parameter',
-            '[...catchall] [positional]' => 'Positional parameters must come before catchAlls',
+            '[...catchall] [positional]'    => 'Positional parameters must come before catchAlls',
         ];
         foreach ($badRoutes as $route => $msg) {
             try {

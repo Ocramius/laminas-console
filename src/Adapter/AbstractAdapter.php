@@ -311,6 +311,7 @@ abstract class AbstractAdapter implements AdapterInterface
             // just write the line at the spec'd position
             $this->setPos($x, $y);
             $this->write($text, $color, $bgColor);
+
             return;
         }
 

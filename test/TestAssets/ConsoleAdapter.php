@@ -9,6 +9,7 @@
 namespace LaminasTest\Console\TestAssets;
 
 use Laminas\Console\Adapter\AbstractAdapter;
+use phpDocumentor\Reflection\Types\Boolean;
 
 /**
  * @group      Laminas_Console
@@ -17,13 +18,16 @@ class ConsoleAdapter extends AbstractAdapter
 {
     public $stream;
 
-    public $autoRewind = true;
+    public bool $autoRewind = true;
 
-    public $testWidth = 80;
+    public int $testWidth = 80;
 
-    public $testIsUtf8 = true;
+    public bool $testIsUtf8 = true;
 
-    public $writtenData = [];
+    /**
+     * @var Array<string>
+     */
+    public $writtenData;
 
     /**
      * Construct.
@@ -41,12 +45,13 @@ class ConsoleAdapter extends AbstractAdapter
      * @param int $maxLength        Maximum response length
      * @return string
      */
-    public function readLine($maxLength = 2048)
+    public function readLine($maxLength = 2048): string
     {
         if ($this->autoRewind) {
             rewind($this->stream);
         }
         $line = stream_get_line($this->stream, $maxLength, PHP_EOL) ?: '';
+
         return rtrim($line, PHP_EOL);
     }
 
@@ -56,7 +61,7 @@ class ConsoleAdapter extends AbstractAdapter
      * @param string|null   $mask   A list of allowed chars
      * @return string
      */
-    public function readChar($mask = null)
+    public function readChar($mask = null): string|false
     {
         if ($this->autoRewind) {
             rewind($this->stream);
@@ -64,6 +69,7 @@ class ConsoleAdapter extends AbstractAdapter
         do {
             $char = fread($this->stream, 1);
         } while ("" === $char || ($mask !== null && false === strstr($mask, $char)));
+
         return $char;
     }
 
@@ -71,9 +77,8 @@ class ConsoleAdapter extends AbstractAdapter
      * Force reported width for testing purposes.
      *
      * @param int $width
-     * @return int
      */
-    public function setTestWidth($width)
+    public function setTestWidth($width): void
     {
         $this->testWidth = $width;
     }
@@ -83,17 +88,17 @@ class ConsoleAdapter extends AbstractAdapter
      *
      * @param bool $isUtf8
      */
-    public function setTestUtf8($isUtf8)
+    public function setTestUtf8($isUtf8): void
     {
         $this->testIsUtf8 = $isUtf8;
     }
 
-    public function isUtf8()
+    public function isUtf8(): bool
     {
         return $this->testIsUtf8;
     }
 
-    public function getWidth()
+    public function getWidth(): int
     {
         return $this->testWidth;
     }
@@ -104,7 +109,7 @@ class ConsoleAdapter extends AbstractAdapter
      * @param null $color
      * @param null $bgColor
      */
-    public function write($text, $color = null, $bgColor = null)
+    public function write($text, $color = null, $bgColor = null): void
     {
         $this->writtenData[] = $text;
         parent::write($text, $color, $bgColor);
