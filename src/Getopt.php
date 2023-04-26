@@ -8,6 +8,9 @@
 
 namespace Laminas\Console;
 
+use function json_encode;
+use const JSON_THROW_ON_ERROR;
+
 /**
  * Getopt is a class to parse options for command-line
  * applications.
@@ -456,8 +459,7 @@ class Getopt
             ];
         }
 
-        $json = \Laminas\Json\Json::encode($j);
-        return $json;
+        return json_encode($j, JSON_THROW_ON_ERROR);
     }
 
     /**
