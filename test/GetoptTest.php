@@ -8,6 +8,7 @@
 
 namespace LaminasTest\Console;
 
+use Laminas\Console\Exception\RuntimeException;
 use Laminas\Console\Getopt;
 use PHPUnit\Framework\TestCase;
 
@@ -136,7 +137,7 @@ class GetoptTest extends TestCase
         try {
             $opts->parse();
             $this->fail('Expected to catch Laminas\Console\Exception\RuntimeException');
-        } catch (\Laminas\Console\Exception\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             $this->assertEquals($e->getMessage(), 'Option "pear" is not recognized.');
         }
         $opts->addRules(['pear|p=s' => 'Pear option']);
@@ -319,7 +320,7 @@ class GetoptTest extends TestCase
             );
             $opts->parse();
             $this->fail('Expected to catch \Laminas\Console\Exception\RuntimeException');
-        } catch (\Laminas\Console\Exception\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             $message = preg_replace(
                 '/Usage: .* \[ options \]/',
                 'Usage: <progname> [ options ]',
@@ -432,7 +433,7 @@ class GetoptTest extends TestCase
         try {
             $opts->parse();
             $this->fail('Expected to catch \Laminas\Console\Exception\RuntimeException');
-        } catch (\Laminas\Console\Exception\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             $this->assertEquals(
                 $e->getMessage(),
                 'Option "apple" requires an integer parameter, but was given "noninteger".'
@@ -446,7 +447,7 @@ class GetoptTest extends TestCase
         try {
             $opts->parse();
             $this->fail('Expected to catch \Laminas\Console\Exception\RuntimeException');
-        } catch (\Laminas\Console\Exception\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             $this->assertEquals(
                 $e->getMessage(),
                 'Option "banana" requires a single-word parameter, but was given "two words".'
@@ -574,7 +575,7 @@ class GetoptTest extends TestCase
             ['--colors=red', '--colors=green', '--colors=blue']
         );
 
-        $this->assertEquals('string', gettype($opts->colors));
+        $this->assertIsString($opts->colors);
         $this->assertEquals('blue', $opts->colors, 'Should be equal to last variable');
     }
 
@@ -586,8 +587,8 @@ class GetoptTest extends TestCase
             [Getopt::CONFIG_CUMULATIVE_PARAMETERS => true]
         );
 
-        $this->assertEquals('array', gettype($opts->colors), 'Colors value should be an array');
-        $this->assertEquals('red,green,blue', implode(',', $opts->colors));
+        $this->assertIsArray($opts->colors, 'Colors value should be an array');
+        $this->assertSame('red,green,blue', implode(',', $opts->colors));
     }
 
     public function testGetoptIgnoreCumulativeFlagsByDefault()
@@ -772,5 +773,17 @@ class GetoptTest extends TestCase
         $opts->parse();
 
         $this->assertNull($bearCallbackCalled);
+    }
+
+    public function testOptionCallbackReturnsFallsAndThrowException()
+    {
+        $opts = new Getopt('x', ['-x']);
+        $opts->setOptionCallback('x', function () {
+            return false;
+        });
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The option x is invalid. See usage.');
+        $opts->parse();
     }
 }

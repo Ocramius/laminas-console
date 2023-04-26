@@ -8,6 +8,7 @@
 
 namespace LaminasTest\Console\Adapter;
 
+use Laminas\Console\Exception\InvalidArgumentException;
 use LaminasTest\Console\TestAssets\ConsoleAdapter;
 use PHPUnit\Framework\TestCase;
 
@@ -27,22 +28,19 @@ class AbstractAdapterTest extends TestCase
         $this->adapter->stream = fopen('php://memory', 'w+');
     }
 
-    public
-    function tearDown(): void
+    public function tearDown(): void
     {
         fclose($this->adapter->stream);
     }
 
-    public
-    function testWriteChar()
+    public function testWriteChar()
     {
         ob_start();
         $this->adapter->write('foo');
         $this->assertEquals('foo', ob_get_clean());
     }
 
-    public
-    function testWriteText()
+    public function testWriteText()
     {
         ob_start();
         $this->adapter->writeText('foo');
@@ -187,5 +185,29 @@ class AbstractAdapterTest extends TestCase
 
         //just get rid of the data in ob
         ob_get_clean();
+    }
+
+    public function testInvalidCoords()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Supplied X,Y coordinates are invalid.');
+
+        $this->adapter->writeTextBlock('', 1, 1, -1, -9);
+    }
+
+    public function testInvalidWidth()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid width supplied.');
+
+        $this->adapter->writeTextBlock('', 0);
+    }
+
+    public function testInvalidHeight()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid height supplied.');
+
+        $this->adapter->writeTextBlock('', 80, 0, 2, 2);
     }
 }
