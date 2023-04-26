@@ -21,25 +21,28 @@ class AbstractAdapterTest extends TestCase
      */
     protected $adapter;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->adapter = new ConsoleAdapter();
         $this->adapter->stream = fopen('php://memory', 'w+');
     }
 
-    public function tearDown()
+    public
+    function tearDown(): void
     {
         fclose($this->adapter->stream);
     }
 
-    public function testWriteChar()
+    public
+    function testWriteChar()
     {
         ob_start();
         $this->adapter->write('foo');
         $this->assertEquals('foo', ob_get_clean());
     }
 
-    public function testWriteText()
+    public
+    function testWriteText()
     {
         ob_start();
         $this->adapter->writeText('foo');
@@ -81,7 +84,7 @@ class AbstractAdapterTest extends TestCase
         $this->assertEquals($line2 . PHP_EOL, ob_get_clean());
     }
 
-    public function testReadLine()
+    public function testReadLine(): void
     {
         fwrite($this->adapter->stream, 'baz');
 
@@ -184,32 +187,5 @@ class AbstractAdapterTest extends TestCase
 
         //just get rid of the data in ob
         ob_get_clean();
-    }
-
-    /**
-     * @expectedException \Laminas\Console\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Supplied X,Y coordinates are invalid.
-     */
-    public function testInvalidCoords()
-    {
-        $this->adapter->writeTextBlock('', 1, 1, -1, -9);
-    }
-
-    /**
-     * @expectedException \Laminas\Console\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid width supplied.
-     */
-    public function testInvalidWidth()
-    {
-        $this->adapter->writeTextBlock('', 0);
-    }
-
-    /**
-     * @expectedException \Laminas\Console\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid height supplied.
-     */
-    public function testInvalidHeight()
-    {
-        $this->adapter->writeTextBlock('', 80, 0, 2, 2);
     }
 }

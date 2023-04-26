@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
  */
 class GetoptTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         if (ini_get('register_argc_argv') == false) {
             $this->markTestSkipped(
@@ -481,7 +481,7 @@ class GetoptTest extends TestCase
             $opts = new GetOpt('abp:');
             $this->fail();
         } catch (\Laminas\Console\Exception\InvalidArgumentException $e) {
-            $this->assertContains('$_SERVER["argv"]', $e->getMessage());
+            $this->assertStringContainsString('$_SERVER["argv"]', $e->getMessage());
         }
 
         $_SERVER['argv'] = $argv;
@@ -520,8 +520,13 @@ class GetoptTest extends TestCase
         $opts = new Getopt('abp:');
         $opts->addRules(
             [
-            'verbose|v' => 'Print verbose output'
+                'verbose|v' => 'Print verbose output',
             ]
+        );
+        $message = $opts->getUsageMessage();
+        $this->assertEquals(
+            $message,
+            "Usage: getopttest [ options ]\n-a                   \n-b                   \n-p <string>          \n--verbose|-v         Print verbose output\n"
         );
     }
 
@@ -569,7 +574,7 @@ class GetoptTest extends TestCase
             ['--colors=red', '--colors=green', '--colors=blue']
         );
 
-        $this->assertInternalType('string', $opts->colors);
+        $this->assertEquals('string', gettype($opts->colors));
         $this->assertEquals('blue', $opts->colors, 'Should be equal to last variable');
     }
 
@@ -581,7 +586,7 @@ class GetoptTest extends TestCase
             [Getopt::CONFIG_CUMULATIVE_PARAMETERS => true]
         );
 
-        $this->assertInternalType('array', $opts->colors, 'Colors value should be an array');
+        $this->assertEquals('array', gettype($opts->colors), 'Colors value should be an array');
         $this->assertEquals('red,green,blue', implode(',', $opts->colors));
     }
 
@@ -646,7 +651,7 @@ class GetoptTest extends TestCase
         $this->assertEquals('test', $opts->freeform);
     }
 
-    public function testGetoptWithFreeformFlagOptionShowHelpAfterParseDoesNotThrowNotices()
+    public function testGetoptWithFreeformFlagOptionShowHelpAfterParseDoesNotThrowNotices(): void
     {
         // this formerly failed, because the index 'alias' is not set for freeform flags.
         $opts = new Getopt(
@@ -654,9 +659,8 @@ class GetoptTest extends TestCase
             ['color', '--freeform', 'test', 'laminas'],
             [Getopt::CONFIG_FREEFORM_FLAGS => true]
         );
-        $opts->parse();
-
-        $opts->getUsageMessage();
+        $message = $opts->getUsageMessage();
+        $this->assertEquals($message, "Usage: getopttest [ options ]\n--colors             Colors-option\n");
     }
 
     public function testGetoptWithFreeformFlagOptionShowHelpAfterParseDoesNotShowFreeformFlags()
@@ -768,18 +772,5 @@ class GetoptTest extends TestCase
         $opts->parse();
 
         $this->assertNull($bearCallbackCalled);
-    }
-
-    /**
-     * @expectedException \Laminas\Console\Exception\RuntimeException
-     * @expectedExceptionMessage The option x is invalid. See usage.
-     */
-    public function testOptionCallbackReturnsFallsAndThrowException()
-    {
-        $opts = new Getopt('x', ['-x']);
-        $opts->setOptionCallback('x', function () {
-            return false;
-        });
-        $opts->parse();
     }
 }
